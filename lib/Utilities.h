@@ -101,7 +101,7 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
         return -7;
     }
 
-    if(cyclicWeights != 1 || cyclicWeights != 0) {
+    if(cyclicWeights != 1 && cyclicWeights != 0) {
         cout << "The cyclic must be 1 or 0!" << endl;
         return -8;
     }
