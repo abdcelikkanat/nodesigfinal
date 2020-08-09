@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     string edgeFile, embFile, weightDistr;
     int numOfThreads;
     unsigned int walkLen, dimension;
-    bool directed, cyclicweights, verbose;
+    bool directed, cyclicWeights, verbose;
     T alpha;
 
     // Default values
@@ -33,17 +33,22 @@ int main(int argc, char** argv) {
     alpha = 1.0;
     weightDistr = "cauchy";
     numOfThreads = 0;
-    cyclicweights = true;
+    cyclicWeights = false;
     verbose = true;
 
     auto start_time = chrono::steady_clock::now();
 
-    int err_code =  parse_arguments(argc, argv, edgeFile, embFile, walkLen, dimension, alpha, weightDistr, numOfThreads, verbose);
+    int err_code =  parse_arguments(argc, argv, edgeFile, embFile, walkLen, dimension, alpha, weightDistr, numOfThreads, cyclicWeights, verbose);
 
     if(err_code != 0) {
         if(err_code < 0)
             cout << "+ Error code: " << err_code << endl;
         return 0;
+    }
+
+    if(numOfThreads > 0) {
+        omp_set_dynamic(0);
+        omp_set_num_threads(numOfThreads);
     }
 
     if(verbose) {
@@ -52,7 +57,8 @@ int main(int argc, char** argv) {
         cout << "+ Dimension: " << dimension << endl;
         cout << "+ Alpha: " << alpha << endl;
         cout << "+ Weight distribution: " << weightDistr << endl;
-        cout << "+ Number of threads: " << numOfThreads << endl;
+        cout << "+ Number of threads: " << (numOfThreads ? to_string(numOfThreads) : to_string(omp_get_num_threads()))
+             << " (default max value)" << endl;
         cout << "------------------------------------" << endl;
     }
 
@@ -70,7 +76,7 @@ int main(int argc, char** argv) {
     vector <vector <pair<unsigned int, double>>> adjList = g.getAdjList<T>();
     vector <vector <pair<unsigned int, T>>> P = constructTransitionMatrix<T>(numOfNodes, adjList);
 
-    Model<T> m(numOfNodes, dimension, weightDistr, cyclicweights, verbose);
+    Model<T> m(numOfNodes, dimension, weightDistr, cyclicWeights, verbose);
     m.learnEmb(P, walkLen, alpha, embFile);
 
     auto end_time = chrono::steady_clock::now();

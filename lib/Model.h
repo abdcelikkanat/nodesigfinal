@@ -70,7 +70,6 @@ void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int wal
 
     default_random_engine generator(this->_rd());
 
-    bool cauchy_distr;
 
     if( this->_weightDistr.compare("cauchy") == 0 ) {
 

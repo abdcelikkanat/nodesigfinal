@@ -16,12 +16,12 @@ using namespace std;
 
 
 int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, unsigned int &walkLen,
-                    unsigned int &dimension, float &alpha, string &weightDistr, int &numOfThreads,
+                    unsigned int &dimension, float &alpha, string &weightDistr, int &numOfThreads, bool cyclicWeights,
                     bool &verbose) {
 
     vector <string> parameter_names{"--help",
                                     "--edgefile", "--embfile", "--walklen", "--dim",
-                                    "--alpha", "--weightdistr", "--numthreads",
+                                    "--alpha", "--weightdistr", "--numthreads", "--cyclic",
                                     "--verbose"
     };
 
@@ -39,7 +39,8 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
     help_msg_opt << "\t[ " << parameter_names[5] << " (Default: " << alpha << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[6] << " (Default: " << weightDistr << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[7] << " (Default: " << numOfThreads << ") ]\n";
-    help_msg_opt << "\t[ " << parameter_names[8] << " (Default: " << verbose << ") ]\n";
+    help_msg_opt << "\t[ " << parameter_names[8] << " (Default: " << cyclicWeights << ") ]\n";
+    help_msg_opt << "\t[ " << parameter_names[9] << " (Default: " << verbose << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[0] << ", -h ] Shows this message";
 
     help_msg << "" << help_msg_required.str() << help_msg_opt.str();
@@ -64,6 +65,8 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
         } else if (arg_name.compare(parameter_names[7]) == 0) {
             numOfThreads = stoi(argv[i + 1]);
         } else if (arg_name.compare(parameter_names[8]) == 0) {
+            cyclicWeights = stoi(argv[i + 1]);
+        } else if (arg_name.compare(parameter_names[9]) == 0) {
             verbose = stoi(argv[i + 1]);
         } else if (arg_name.compare(parameter_names[0]) == 0 or arg_name.compare("-h") == 0) {
             cout << help_msg.str() << endl;
@@ -96,6 +99,11 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
     if(numOfThreads < 0) {
         cout << "The number of threads must be greater than zero!" << endl;
         return -7;
+    }
+
+    if(cyclicWeights != 1 || cyclicWeights != 0) {
+        cout << "The cyclic must be 1 or 0!" << endl;
+        return -8;
     }
 
     return 0;
