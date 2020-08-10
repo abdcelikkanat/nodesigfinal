@@ -15,4 +15,4 @@ CYCLIC=0
                           --alpha ${ALPHA} \
                           --weightdistr ${WEIGHTDISTR} \
                           --numthreads ${NUMTHREADS} \
-                          --cyclic ${CYCLIC})  2>&1 | tee ../deneme.log
+                          --cyclic ${CYCLIC})  2>&1 | tee ${LOG_FILE}
