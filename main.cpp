@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
         cout << "+ Weight distribution: " << weightDistr << endl;
         cout << "+ Number of threads: " << (numOfThreads ? to_string(numOfThreads) : to_string(omp_get_num_threads()))
              << " (default max value)" << endl;
+        cout << "+ Cyclic: " << cyclicWeights << endl;
         cout << "------------------------------------" << endl;
     }
 
