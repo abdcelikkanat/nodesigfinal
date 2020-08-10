@@ -1,5 +1,6 @@
 set -x
 
+LOG_FILE=../log/karate.log
 EDGE_FILE=../tests/karate.edgelist
 OUTPUTFILE=../deneme.embedding
 WALKLEN=5
