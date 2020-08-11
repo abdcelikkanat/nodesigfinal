@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     typedef float T;
     string edgeFile, embFile, weightDistr;
     int numOfThreads;
-    unsigned int walkLen, dimension;
+    unsigned int walkLen, dimension, weightBlockSize;
     bool directed, cyclicWeights, verbose;
     T alpha;
 
@@ -34,11 +34,12 @@ int main(int argc, char** argv) {
     weightDistr = "cauchy";
     numOfThreads = 0;
     cyclicWeights = false;
+    weightBlockSize = 0;
     verbose = true;
 
     auto start_time = chrono::steady_clock::now();
 
-    int err_code =  parse_arguments(argc, argv, edgeFile, embFile, walkLen, dimension, alpha, weightDistr, numOfThreads, cyclicWeights, verbose);
+    int err_code =  parse_arguments(argc, argv, edgeFile, embFile, walkLen, dimension, alpha, weightDistr, numOfThreads, cyclicWeights, weightBlockSize, verbose);
 
     if(err_code != 0) {
         if(err_code < 0)
@@ -60,6 +61,7 @@ int main(int argc, char** argv) {
         cout << "+ Number of threads: " << (numOfThreads ? to_string(numOfThreads) : to_string(omp_get_num_threads())
              + " (default max value)") << endl;
         cout << "+ Cyclic: " << cyclicWeights << endl;
+        cout << "+ Weight block size: " << weightBlockSize << endl;
         cout << "------------------------------------" << endl;
     }
 
@@ -78,7 +80,7 @@ int main(int argc, char** argv) {
     vector <vector <pair<unsigned int, T>>> P = constructTransitionMatrix<T>(numOfNodes, adjList);
 
     Model<T> m(numOfNodes, dimension, weightDistr, cyclicWeights, verbose);
-    m.learnEmb(P, walkLen, alpha, embFile);
+    m.learnEmb(P, walkLen, alpha, weightBlockSize, embFile);
 
     auto end_time = chrono::steady_clock::now();
     if (verbose)

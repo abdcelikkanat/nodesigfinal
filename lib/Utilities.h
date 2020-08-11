@@ -16,12 +16,13 @@ using namespace std;
 
 
 int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, unsigned int &walkLen,
-                    unsigned int &dimension, float &alpha, string &weightDistr, int &numOfThreads, bool cyclicWeights,
+                    unsigned int &dimension, float &alpha, string &weightDistr,
+                    int &numOfThreads, bool &cyclicWeights, unsigned int &weightBlockSize,
                     bool &verbose) {
 
     vector <string> parameter_names{"--help",
                                     "--edgefile", "--embfile", "--walklen", "--dim",
-                                    "--alpha", "--weightdistr", "--numthreads", "--cyclic",
+                                    "--alpha", "--weightdistr", "--numthreads", "--cyclic", "--blocksize",
                                     "--verbose"
     };
 
@@ -40,7 +41,8 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
     help_msg_opt << "\t[ " << parameter_names[6] << " (Default: " << weightDistr << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[7] << " (Default: " << numOfThreads << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[8] << " (Default: " << cyclicWeights << ") ]\n";
-    help_msg_opt << "\t[ " << parameter_names[9] << " (Default: " << verbose << ") ]\n";
+    help_msg_opt << "\t[ " << parameter_names[9] << " (Default: " << weightBlockSize << ") ]\n";
+    help_msg_opt << "\t[ " << parameter_names[10] << " (Default: " << verbose << ") ]\n";
     help_msg_opt << "\t[ " << parameter_names[0] << ", -h ] Shows this message";
 
     help_msg << "" << help_msg_required.str() << help_msg_opt.str();
@@ -67,6 +69,8 @@ int parse_arguments(int argc, char** argv, string &edgeFile, string &embFile, un
         } else if (arg_name.compare(parameter_names[8]) == 0) {
             cyclicWeights = stoi(argv[i + 1]);
         } else if (arg_name.compare(parameter_names[9]) == 0) {
+            weightBlockSize = stoi(argv[i + 1]);
+        } else if (arg_name.compare(parameter_names[10]) == 0) {
             verbose = stoi(argv[i + 1]);
         } else if (arg_name.compare(parameter_names[0]) == 0 or arg_name.compare("-h") == 0) {
             cout << help_msg.str() << endl;

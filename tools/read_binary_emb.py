@@ -47,7 +47,7 @@ def read_emb_file(file_path):
     return embs
 
 
-file_path = "./deneme.embedding"
+file_path = "../deneme.embedding"
 
 embs = read_emb_file(file_path)
 

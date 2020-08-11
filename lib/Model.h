@@ -34,8 +34,8 @@ public:
     Model(unsigned int numOfNodes, unsigned int dim, string weightDistr, bool cyclicweights, bool verbose);
     ~Model();
     void learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int walkLen, T alpha, string filePath);
-
-};
+    void learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int walkLen, T alpha, int weightBlockSize, string filePath);
+    };
 
 template<typename T>
 Model<T>::Model(unsigned int numOfNodes, unsigned int dim, string weightDistr, bool cyclicweights, bool verbose) {
@@ -221,7 +221,104 @@ void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int 
 }
 
 
+template<typename T>
+void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int walkLen, T alpha, int weightBlockSize, string filePath) {
 
+    if(weightBlockSize == 0 || weightBlockSize == this->_dim) {
+        learnEmb(P, walkLen, alpha, filePath);
+        return;
+    }
+    fstream fs(filePath, fstream::out | fstream::binary);
+    if(fs.is_open()) {
+
+        // Write the header
+        fs.write(reinterpret_cast<const char *>(&_dim), _headerBlockSize);
+        fs.write(reinterpret_cast<const char *>(&_numOfNodes), _headerBlockSize);
+
+    } else {
+        cout << "+ An error occurred during opening the file!" << endl;
+    }
+
+    int currentWeightBlockSize;
+    int weightBlockCount = ceil(this->_dim / (float)weightBlockSize);
+    for(int currentWeightBlockIdx=0; currentWeightBlockIdx<weightBlockCount; currentWeightBlockIdx++) {
+
+        if( this->_dim > weightBlockSize*(currentWeightBlockIdx+1) )
+            currentWeightBlockSize = weightBlockSize;
+        else
+            currentWeightBlockSize = weightBlockSize*(currentWeightBlockIdx+1)-this->_dim;
+
+        if(this->_verbose)
+            cout << "+ The computation of walks for the weight block "
+                 << currentWeightBlockIdx+1 << weightBlockCount <<" has just started." << endl;
+
+        this->_generateWeights(this->_numOfNodes, currentWeightBlockSize, walkLen);
+
+        T **current = new T*[this->_numOfNodes];
+        for(unsigned int node=0; node < this->_numOfNodes; node++)
+            current[node] = new T[currentWeightBlockSize]{0};
+
+
+        for (int l = 0; l < walkLen; l++) {
+
+            if (this->_verbose)
+                cout << "\t- Walk: " << l + 1 << "/" << walkLen << endl;
+
+            T **temp = new T *[this->_numOfNodes];
+            for (unsigned int node = 0; node < this->_numOfNodes; node++)
+                temp[node] = new T[currentWeightBlockSize]{0};
+
+            #pragma omp parallel for
+            for (unsigned node = 0; node < this->_numOfNodes; node++) {
+
+                for (int d = 0; d < currentWeightBlockSize; d++) {
+                    temp[node][d] = 0;
+                    for (unsigned int nbIdx = 0; nbIdx < P[node].size(); nbIdx++)
+                        temp[node][d] +=
+                                (current[get<0>(P[node][nbIdx])][d] + this->_weights[get<0>(P[node][nbIdx])][d]) *
+                                get<1>(P[node][nbIdx]);
+
+                    temp[node][d] *= alpha;
+                }
+
+            }
+
+            for (unsigned int node = 0; node < this->_numOfNodes; node++)
+                delete[] current[node];
+            delete[] current;
+            current = temp;
+
+
+        }
+
+
+        fstream fs(filePath, ios_base::app);
+        if (fs.is_open()) {
+
+            for (unsigned int d = 0; d < currentWeightBlockSize; d++) {
+
+                vector<uint8_t> bin(ceil(this->_numOfNodes / 8.0), 0);
+                for (unsigned int node = 0; node < this->_numOfNodes; node++) {
+                    bin[int(node / 8)] <<= 1;
+                    if (current[node][d] > 0)
+                        bin[int(node / 8)] += 1;
+                }
+                copy(bin.begin(), bin.end(), std::ostreambuf_iterator<char>(fs));
+            }
+
+            fs.close();
+
+        } else {
+            cout << "+ An error occurred during opening the file!" << endl;
+        }
+
+        for (unsigned int node = 0; node < this->_numOfNodes; node++)
+            delete[] current[node];
+        delete[] current;
+
+    }
+
+}
 
 
 
