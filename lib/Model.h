@@ -68,7 +68,7 @@ void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int wal
     auto start_time = chrono::steady_clock::now();
 
     if (this->_verbose)
-        cout << "\t- A weight matrix of size " << this->_numOfNodes << "x" << this->_dim << " is being (re)generated." << endl;
+        cout << "\t- A weight matrix of size " << N << "x" << M << " is being (re)generated." << endl;
 
     default_random_engine generator(this->_rd());
 
