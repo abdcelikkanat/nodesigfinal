@@ -246,10 +246,10 @@ void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int 
     int weightBlockCount = ceil(this->_dim / (float)weightBlockSize);
     for(int currentWeightBlockIdx=0; currentWeightBlockIdx<weightBlockCount; currentWeightBlockIdx++) {
 
-        if( this->_dim > weightBlockSize*(currentWeightBlockIdx+1) )
+        if( this->_dim >= weightBlockSize*(currentWeightBlockIdx+1) )
             currentWeightBlockSize = weightBlockSize;
         else
-            currentWeightBlockSize = weightBlockSize*(currentWeightBlockIdx+1)-this->_dim;
+            currentWeightBlockSize = weightBlockSize*(currentWeightBlockIdx+1) - this->_dim;
 
         if(this->_verbose)
             cout << "+ The computation of walks for the weight block "
@@ -318,6 +318,13 @@ void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int 
         for (unsigned int node = 0; node < this->_numOfNodes; node++)
             delete[] current[node];
         delete[] current;
+
+        if(currentWeightBlockIdx < weightBlockCount-1) {
+            for (unsigned int node = 0; node < this->_numOfNodes; node++)
+                delete[] this->_weights[node];
+            delete[] this->_weights;
+        }
+
 
     }
 
