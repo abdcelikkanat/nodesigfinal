@@ -65,6 +65,8 @@ Model<T>::~Model() {
 template<typename T>
 void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int walklen) {
 
+    auto start_time = chrono::steady_clock::now();
+
     if (this->_verbose)
         cout << "\t- A weight matrix of size " << this->_numOfNodes << "x" << this->_dim << " is being (re)generated." << endl;
 
@@ -139,8 +141,9 @@ void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int wal
 
     }
 
+    auto end_time = chrono::steady_clock::now();
     if (this->_verbose)
-        cout << "\t- Completed!" << endl;
+        cout << "\t- Completed in " << chrono::duration_cast<chrono::seconds>(end_time - start_time).count() << " seconds." << endl;
 
 }
 
