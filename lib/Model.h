@@ -261,7 +261,7 @@ void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int 
             cout << "+ The computation of walks for the weight block "
                  << currentWeightBlockIdx+1 << "/" << weightBlockCount <<" has just started." << endl;
 
-        this->_generateWeights(this->_numOfNodes, currentWeightBlockSize, walkLen);
+        this->_generateWeights(this->_numOfNodes, currentWeightBlockSize, walkLen, alpha);
 
         T **current = new T*[this->_numOfNodes];
         for(unsigned int node=0; node < this->_numOfNodes; node++)
