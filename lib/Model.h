@@ -27,7 +27,7 @@ private:
     bool _cyclicweights;
     bool _verbose;
 
-    void _generateWeights(unsigned int N, unsigned int M, unsigned int walklen);
+    void _generateWeights(unsigned int N, unsigned int M, unsigned int walklen, T alpha);
 
 public:
 
@@ -63,7 +63,7 @@ Model<T>::~Model() {
 }
 
 template<typename T>
-void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int walklen) {
+void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int walklen, T alpha) {
 
     auto start_time = chrono::steady_clock::now();
 
@@ -79,12 +79,18 @@ void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int wal
 
         if( this->_cyclicweights ) {
 
+            T alphaSum = 0, alphaPow=1;
+            for(int l=0; l<walklen; l++) {
+                alphaPow *= alpha;
+                alphaSum += alphaPow;
+            }
+
             this->_weights = new T *[N];
             for (unsigned int n = 0; n < N; n++) {
                 this->_weights[n] = new T[M];
                 if(n % M == 0) {
                     for (unsigned int nb = 0; nb < M; nb++) {
-                        this->_weights[n][nb] = distribution(generator) / walklen;
+                        this->_weights[n][nb] = distribution(generator) / alphaSum;
                     }
                 } else {
                     for (unsigned int nb = 0; nb < M; nb++)
@@ -150,7 +156,7 @@ void Model<T>::_generateWeights(unsigned int N, unsigned int M, unsigned int wal
 template<typename T>
 void Model<T>::learnEmb(vector <vector <pair<unsigned int, T>>> P, unsigned int walkLen, T alpha, string filePath) {
 
-    this->_generateWeights(this->_numOfNodes, this->_dim, walkLen);
+    this->_generateWeights(this->_numOfNodes, this->_dim, walkLen, alpha);
 
 
     T **current = new T*[this->_numOfNodes];
