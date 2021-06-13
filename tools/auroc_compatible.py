@@ -236,11 +236,23 @@ def predict(input_folder, graph_name, emb_file, file_type, binary_operator, outp
     print("Metric type: {}".format(binary_operator))
     print("-----------------------------------------------")
 
-    test_g = nx.read_gml(input_folder+"/"+graph_name+"_gcc_test.gml")
-    test_neg_samples = np.load(input_folder+"/"+graph_name+"_gcc_test_negative_samples.npy")
+    #test_g = nx.read_gml(input_folder+"/"+graph_name+"_gcc_test.gml")
+    #test_neg_samples = np.load(input_folder+"/"+graph_name+"_gcc_test_negative_samples.npy")
+    
+    sample_file_path = input_folder+"/samples/"+graph_name+"_gcc_samples.pkl"
+    test_graph_path = "" #input_folder+"/residuals/"+graph_name+"_gcc_residual.gml"
 
-    test_samples = [list(edge) for edge in test_g.edges()] + test_neg_samples.tolist()
-    test_labels = [1 for _ in test_g.edges()] + [0 for _ in test_neg_samples]
+    print("Sample file path: {}".format(sample_file_path))
+    print("Graph file path: {}".format(test_graph_path))
+
+    with open(sample_file_path, 'rb') as f:
+        temp = pickle.load(f)
+        test_samples, test_labels = temp['test']['edges'], temp['test']['labels']
+    print(len(test_labels))
+    #test_g = nx.read_gml(test_graph_path)
+
+    #test_samples = [list(edge) for edge in test_g.edges()] + test_neg_samples.tolist()
+    #test_labels = [1 for _ in test_g.edges()] + [0 for _ in test_neg_samples]
 
     embs = read_emb_file(emb_file, file_type=file_type)
 

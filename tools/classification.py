@@ -269,6 +269,8 @@ if __name__ == "__main__":
         training_ratios = [0.1, 0.5]
     elif sys.argv[5] == "custom-big":
         training_ratios = [ 0.9]
+    elif sys.argv[5] == "custom-thesis":
+        training_ratios = [ 0.02, 0.04, 0.06, 0.08, 0.1, 0.3, 0.5, 0.7, 0.9]
     else:
         raise ValueError("Invalid training ratio")
 
